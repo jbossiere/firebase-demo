@@ -27,7 +27,7 @@
 	</head>
 
 	<!-- Initiate app and controller on body -->
-	<body >
+	<body ng-app="myApp" ng-controller="myCtrl">
 
 		<!-- Header with logout button -->
 		<header>
@@ -42,12 +42,14 @@
 		<div class="container">
 			
 			<!-- Sign-in/sign-up form: show if userId isn't defined -->
-			<form name="myForm" novalidate>
+			<form ng-show="!userId" name="myForm" novalidate>
 			
 				<!-- Bind model "handle" to this input, set minimum length, and make it required -->
 				<div class="form-group">
 					<label>Handle:</label>
-					<input name="handle" class="form-control">	
+					<input ng-model="handle" ng-minlength="6" name="handle" class="form-control" required>
+                    <p class="help-block" ng-show="myForm.handle.$error.minlength">Handle is too short</p>
+
 					
 					<!-- Add an error message if the length is too short -->	
 					
@@ -61,24 +63,24 @@
 				</div>
 
 				<!-- Bind model "email" to this input and make it required -->
-				<div class="form-group">
+				<div class="form-group"> <!-- Can add ng-class"{'has-error':etc}" to make the input box red when there is an error -->
 					<label>Email:</label>
-					<input  name="email" type="email" class="form-control"></input>
+					<input  ng-model="email" name="email" type="email" class="form-control" required></input>
+                    <p class="help-block" ng-show="myForm.email.$error.email">Not an email</p>
 
 					<!-- Show an error message if the email is not valid -->	
 				</div>
-
 				<!-- Password -->
 				<div class="form-group">
 					<label>Password:</label>
 					<input  name="password" type="password" class="form-control" ng-model="password" required></input>      
 				</div>
 
-				<!-- Submit buttons: should only be active if certain inputs are valid -->
+				<!-- Submit buttons: should only be active if certain inputs are valid signup works if the whole form is invalid, signin is invalid if either email or username is invalid-->
 				<div class="form-group">
 					<button ng-click="signUp()" ng-disabled="myForm.$invalid" type="submit" class="btn btn-primary">Sign-up</button> 
 					<button ng-click="signIn()" ng-disabled="myForm.email.$invalid || myForm.password.$invalid" type="submit" class="btn btn-primary">Sign-in</button>
-				</div>
+				</div> 
 
 			</form>
 
@@ -114,18 +116,18 @@
 				<div>
 
 					<!-- Use ng-repeat directive to repeat a div for each element in tweets -->
-					<div class="tweet-box">
+					<div class="tweet-box" ng-repeat="tweet in tweets | orderBy: '-time'">
 						<div>
 							<!-- Put an img tag that shows the userImage of that tweet -->
 							<img class="image" ng-src="{{users[tweet.userId].userImage}}"></img>
 							
 							<!-- Put in the twitter handle and time of tweet -->
-							<span class="handle"></span>
-							<span class="time"></span>
+							<span class="handle">{{users[tweet.userId].handle}}</span>
+							<span class="time">{{tweet.time | date}}</span>
 						</div>
 
 						<!-- Put in the text of the tweet -->
-						<div class="tweet">
+						<div class="tweet">{{tweet.text}}
 							
 						</div>
 
@@ -133,9 +135,9 @@
 						<div class="likes">
 							<!-- Show a heart icon that, when clicked, 
 								passes your tweet to your "like" function -->
-							<i></i>
+							<i ng-click="like(tweet)" class="fa fa-heart"></i>
 							<!-- Show your total number of likes -->
-							<span></span>
+							<span>{{tweet.likes}}</span>
 						</div>
 					</div>
 				</div>
